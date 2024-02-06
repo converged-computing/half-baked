@@ -1,0 +1,20 @@
+apiVersion: flux-framework.org/v1alpha2
+kind: MiniCluster
+metadata:
+  name: half-baked-pi
+spec:
+  size: 4
+  logging:
+    quiet: true
+  flux:
+    container:
+      image: ghcr.io/converged-computing/flux-view-ubuntu:tag-jammy
+  containers:
+    - image: ghcr.io/converged-computing/half-baked:pi
+      command: /opt/code/half-baked
+      pullAlways: true
+      commands:
+        pre: |
+          llc -filetype=obj pthreadTimed.ll -o half-baked.o
+          clang -lm half-baked.o -o half-baked
+        

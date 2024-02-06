@@ -4,7 +4,8 @@ RUN apt-get update
 RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install \
     build-essential \
     git \
-    clang
+    clang \
+    llvm
 
 # https://lists.llvm.org/pipermail/llvm-dev/2014-September/076375.html
 RUN git clone https://github.com/ishanthilina/Pthreads-Monte-Carlo-Pi-Calculation /opt/code
