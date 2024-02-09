@@ -100,6 +100,7 @@ Some comments:
 1. The hardest part is getting the initial llvm-ir, and then the follow up command to build, which is going to require:
   a. preserving flags
   b. knowing how to generate the llvm-ir not just across a project, but for libraries of interest.
+2. Dinos makes a good point that [some macros are resolved](https://libc.llvm.org/dev/code_style.html) early in compilation. We will want to understand the set that are and what is left to further customize.
 
 ### Clean Up
 
