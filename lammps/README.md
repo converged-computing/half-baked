@@ -58,7 +58,6 @@ And for the lmp executable:
 
 ```bash
 llc -filetype=obj -O0 --relocation-model=pic --runtime-counter-relocation --relax-elf-relocations main.cpp.bc -o lmp.o
-cp ../lammps_bc/lammps.so .
 clang -lstdc++ -lmpi -lmpi_cxx -lm -llammps lmp.o -o lmp
 ```
 
