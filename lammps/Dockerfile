@@ -41,12 +41,15 @@ RUN cd /opt/lammps && \
     . /etc/profile && \ 
     git clone https://github.com/compor/llvm-ir-cmake-utils /tmp/cmake-utils && \
     cp /tmp/cmake-utils/cmake/* /opt/lammps/cmake/Modules && \
-    cmake ../cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DPKG_REAXFF=yes -DBUILD_MPI=no -DPKG_OPT=yes -DFFT=FFTW3 -DCMAKE_PREFIX_PATH=/usr/lib/mpich -DCMAKE_PREFIX_PATH=/usr/lib/x86_64-linux-gnu -DLINKER_LANGUAGE=CXX -DCMAKE_CXX_COMPILER=clang++ && \
+    cmake ../cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_C_FLAGS="-O0 -fPIC" -DCMAKE_CXX_FLAGS="-O0 -fPIC" -DPKG_REAXFF=yes -DBUILD_MPI=no -DPKG_OPT=yes -DFFT=FFTW3 -DCMAKE_PREFIX_PATH=/usr/lib/mpich -DCMAKE_PREFIX_PATH=/usr/lib/x86_64-linux-gnu -DLINKER_LANGUAGE=CXX -DCMAKE_CXX_COMPILER=clang++ && \
     cmake --build . --target gitversion && \
     cmake --build . --target lmp_bc lammps_bc && \
     cd ./llvm-ir/lmp_bc && \
     llvm-dis ./main.cpp.bc && \
     cd ../lammps_bc && \
     llvm-dis ./*.bc 
-    
+
+# To finish this build see instructions in the README.
+# 1. The lammps.so needs to be built first
+# 2. Then the lmp executable, linking to it
 WORKDIR /opt/lammps/build/llvm-ir
