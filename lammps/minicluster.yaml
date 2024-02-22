@@ -1,0 +1,35 @@
+apiVersion: flux-framework.org/v1alpha2
+kind: MiniCluster
+metadata:
+  name: half-baked-lammps
+spec:
+  size: 4
+  logging:
+    quiet: true
+  flux:
+    container:
+      image: ghcr.io/converged-computing/flux-view-ubuntu:tag-jammy
+  containers:
+    - image: ghcr.io/converged-computing/half-baked:lammps-test-feb-20-2024
+      workingDir: /opt/lammps/examples/reaxff/HNS/
+      command: half-baked-lmp -v x 2 -v y 2 -v z 2 -in ./in.reaxc.hns -nocite
+      commands:
+        pre: |
+          # Just be conservative to return to where we started
+          # Note the present working directory is: /opt/lammps/build/llvm-ir
+          cd /opt/lammps/build/llvm-ir/lammps_bc
+          startTime=$(( $(date +%s) + secs ))
+          for filename in $(ls *.ll); do
+            llc -filetype=obj -O0 --relocation-model=pic --runtime-counter-relocation --relax-elf-relocations  $filename -o $filename.o
+          done
+          clang -shared -lstdc++ -lmpi -lmpi_cxx -lm *.o -o lammps.so
+          cp lammps.so /usr/lib/liblammps.so
+          cd ../lmp_bc
+          llc -filetype=obj -O0 --relocation-model=pic --runtime-counter-relocation --relax-elf-relocations main.cpp.bc -o lmp.o
+          clang -lstdc++ -lmpi -lmpi_cxx -lm -llammps lmp.o -o lmp
+          chmod +x lmp
+          cp lmp /usr/local/bin/half-baked-lmp
+          endTime=$(( $(date +%s) + secs ))
+          compileSeconds="$((endTime-startTime))"
+          echo "TIME_COMPILE_SECONDS=$compileSeconds"
+          cd /opt/lammps/examples/reaxff/HNS/
