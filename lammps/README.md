@@ -664,7 +664,13 @@ I did some brief testing that compares 'base cases' to some of the above. I real
 
 - [testing/c2d-standard-8-size-4-no-optimization-flag-vs-O0.txt](testing/c2d-standard-8-size-4-no-optimization-flag-vs-O0.txt): a base case without any optimization flags (would do what the compiler does by default) vs. llc compile with O0 - the second is much slower.
 - [testing/c2d-standard-8-size-4-O0-vs-O0.txt](testing/c2d-standard-8-size-4-O0-vs-O0.txt): made a more fair comparison - O0 vs O0 and the second was slightly faster (one second) of course that does not offset the time it took to finish building.
+- [testing/c2d-standard-8-size-4-O0-vs-clang-03.txt](testing/c2d-standard-8-size-4-O0-vs-clang-03.txt) I added O3 to clang, but not to llc.
+- [testing/c2d-standard-8-size-4-O0-vs-clang-02.txt](testing/c2d-standard-8-size-4-O0-vs-clang-02.txt) I added O2 to clang, but not to llc.
+- [testing/c2d-standard-8-size-4-01-llc-and-clang.txt](testing/c2d-standard-8-size-4-01-llc-and-clang.txt): Using 01 for both llc commands and clang.
+- [testing/c2d-standard-8-size-4-02-llc-and-clang.txt](testing/c2d-standard-8-size-4-02-llc-and-clang.txt): Using 02 for both llc commands and clang.
+- [testing/c2d-standard-8-size-4-03-llc-and-clang.txt](testing/c2d-standard-8-size-4-03-llc-and-clang.txt): Using 03 for both llc commands and clang.
 
+None of the above seem to have improvement, but that's OK, still learning. ;)
 
 ## Kubernetes
 

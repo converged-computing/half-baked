@@ -22,13 +22,13 @@ spec:
           cd /opt/lammps/build/llvm-ir/lammps_bc
           startTime=$(( $(date +%s) + secs ))
           for filename in $(ls *.ll); do
-            llc -filetype=obj -O0 --relocation-model=pic --runtime-counter-relocation --relax-elf-relocations  $filename -o $filename.o
+            llc -filetype=obj -O3 --relocation-model=pic --runtime-counter-relocation --relax-elf-relocations  $filename -o $filename.o
           done
-          clang -shared -lstdc++ -lmpi -lmpi_cxx -lm *.o -o lammps.so
+          clang -O3 -shared -lstdc++ -lmpi -lmpi_cxx -lm *.o -o lammps.so
           cp lammps.so /usr/lib/liblammps.so
           cd ../lmp_bc
-          llc -filetype=obj -O0 --relocation-model=pic --runtime-counter-relocation --relax-elf-relocations main.cpp.bc -o lmp.o
-          clang -lstdc++ -lmpi -lmpi_cxx -lm -llammps lmp.o -o lmp
+          llc -filetype=obj -O3 --relocation-model=pic --runtime-counter-relocation --relax-elf-relocations main.cpp.bc -o lmp.o
+          clang -O3 -lstdc++ -lmpi -lmpi_cxx -lm -llammps lmp.o -o lmp
           chmod +x lmp
           cp lmp /usr/local/bin/half-baked-lmp
           endTime=$(( $(date +%s) + secs ))
