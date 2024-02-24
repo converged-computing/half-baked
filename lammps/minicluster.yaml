@@ -10,11 +10,13 @@ spec:
     container:
       image: ghcr.io/converged-computing/flux-view-ubuntu:tag-jammy
   containers:
-    - image: ghcr.io/converged-computing/half-baked:lammps-test-feb-20-2024
+    - image: ghcr.io/converged-computing/half-baked:lammps-test-feb-24-2024
       workingDir: /opt/lammps/examples/reaxff/HNS/
+      pullAlways: true
       command: half-baked-lmp -v x 2 -v y 2 -v z 2 -in ./in.reaxc.hns -nocite
-      commands:
+      commands: 
         pre: |
+          baked-lmp -v x 2 -v y 2 -v z 2 -in ./in.reaxc.hns -nocite
           # Just be conservative to return to where we started
           # Note the present working directory is: /opt/lammps/build/llvm-ir
           cd /opt/lammps/build/llvm-ir/lammps_bc

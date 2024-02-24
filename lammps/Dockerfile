@@ -34,14 +34,30 @@ RUN wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.2.tar.g
 # -O1 -Xclang -disable-llvm-passes
 RUN python3 -m pip install clang-format
 RUN git clone --depth 1 --branch stable_29Sep2021_update2 https://github.com/lammps/lammps.git /opt/lammps
+
+# This is "baked lammps" built on the original machine
+RUN cd /opt/lammps && \
+    mkdir build && \
+    cd build && \
+    . /etc/profile && \ 
+    cmake ../cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DPKG_REAXFF=yes -DBUILD_MPI=yes -DPKG_OPT=yes -DFFT=FFTW3 -DCMAKE_C_FLAGS="-O0 -fPIC -g -DNDEBUG" -DCMAKE_CXX_FLAGS="-O0 -fPIC -g -DNDEBUG" -DCMAKE_PREFIX_PATH=/usr/lib/mpich -DCMAKE_PREFIX_PATH=/usr/lib/x86_64-linux-gnu && \
+    make && mv ./lmp /usr/local/bin/baked-lmp
+
+RUN rm -rf /opt/lammps && \
+    git clone --depth 1 --branch stable_29Sep2021_update2 https://github.com/lammps/lammps.git /opt/lammps
+
+# This adds the llvm ir cmake modules
 COPY ./CMakeLists.txt /opt/lammps/cmake/CMakeLists.txt
+
+# This disables default -O2 optimization
+COPY ./gcc.cmake /opt/lammps/cmake/presets/gcc.cmake
 RUN cd /opt/lammps && \
     mkdir build && \
     cd build && \
     . /etc/profile && \ 
     git clone https://github.com/compor/llvm-ir-cmake-utils /tmp/cmake-utils && \
     cp /tmp/cmake-utils/cmake/* /opt/lammps/cmake/Modules && \
-    cmake ../cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_C_FLAGS="-O0 -fPIC" -DCMAKE_CXX_FLAGS="-O0 -fPIC" -DPKG_REAXFF=yes -DBUILD_MPI=no -DPKG_OPT=yes -DFFT=FFTW3 -DCMAKE_PREFIX_PATH=/usr/lib/mpich -DCMAKE_PREFIX_PATH=/usr/lib/x86_64-linux-gnu -DLINKER_LANGUAGE=CXX -DCMAKE_CXX_COMPILER=clang++ && \
+    cmake ../cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_C_FLAGS="-O0 -fPIC -g -DNDEBUG" -DCMAKE_CXX_FLAGS="-O0 -fPIC -g -DNDEBUG" -DPKG_REAXFF=yes -DBUILD_MPI=yes -DPKG_OPT=yes -DFFT=FFTW3 -DCMAKE_PREFIX_PATH=/usr/lib/mpich -DCMAKE_PREFIX_PATH=/usr/lib/x86_64-linux-gnu -DLINKER_LANGUAGE=CXX -DCMAKE_CXX_COMPILER=clang++ && \
     cmake --build . --target gitversion && \
     cmake --build . --target lmp_bc lammps_bc && \
     cd ./llvm-ir/lmp_bc && \
@@ -53,3 +69,4 @@ RUN cd /opt/lammps && \
 # 1. The lammps.so needs to be built first
 # 2. Then the lmp executable, linking to it
 WORKDIR /opt/lammps/build/llvm-ir
+COPY ./test-options.sh ./test-options.sh
